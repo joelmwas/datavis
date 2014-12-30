@@ -1,9 +1,19 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-	<title></title>
-	<script type="text/javascript">
-	AmCharts.loadJSON = function(url) {
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>datavis</title>
+</head>
+<body>
+
+  <!-- prerequisites -->
+  <link rel="stylesheet" href="http://www.amcharts.com/lib/style.css" type="text/css">
+  <script src="http://www.amcharts.com/lib/3/amcharts.js" type="text/javascript"></script>
+  <script src="http://www.amcharts.com/lib/3/serial.js" type="text/javascript"></script>
+
+  <!-- cutom functions -->
+  <script>
+AmCharts.loadJSON = function(url) {
   // create the request
   if (window.XMLHttpRequest) {
     // IE7+, Firefox, Chrome, Opera, Safari
@@ -22,84 +32,56 @@
   // parse adn return the output
   return eval(request.responseText);
 };
+  </script>
 
-</script>
-</head>
-<body>
+  <!-- chart container -->
+  <div id="chartdiv" style="width: 600px; height: 300px;"></div>
 
+  <!-- the chart code -->
+  <script>
+var chart;
 
-<?php   
+// create chart
+AmCharts.ready(function() {
 
+  // load the data
+  var chartData = AmCharts.loadJSON('data.php');
 
-// Connect to MySQL
-$link = mysql_connect( 'localhost', 'root', 'wewe' );
-if ( !$link ) {
-  die( 'Could not connect: ' . mysql_error() );
-}
+  // SERIAL CHART
+  chart = new AmCharts.AmSerialChart();
+  chart.pathToImages = "http://www.amcharts.com/lib/images/";
+  chart.dataProvider = chartData;
+  chart.categoryField = "category";
+  chart.dataDateFormat = "YYYY-MM-DD";
 
-// Select the data base
-$db = mysql_select_db( 'datavis', $link );
-if ( !$db ) {
-  die ( 'Error selecting database \'datavis\' : ' . mysql_error() );
-}
+  // GRAPHS
 
-// Fetch the data
-$query = "
-  SELECT *
-  FROM my_chart_data
-  ORDER BY category ASC";
-$result = mysql_query( $query );
+  var graph1 = new AmCharts.AmGraph();
+  graph1.valueField = "value1";
+  graph1.bullet = "round";
+  graph1.bulletBorderColor = "#FFFFFF";
+  graph1.bulletBorderThickness = 2;
+  graph1.lineThickness = 2;
+  graph1.lineAlpha = 0.5;
+  chart.addGraph(graph1);
 
-// All good?
-if ( !$result ) {
-  // Nope
-  $message  = 'Invalid query: ' . mysql_error() . "\n";
-  $message .= 'Whole query: ' . $query;
-  die( $message );
-}
+  var graph2 = new AmCharts.AmGraph();
+  graph2.valueField = "value2";
+  graph2.bullet = "round";
+  graph2.bulletBorderColor = "#FFFFFF";
+  graph2.bulletBorderThickness = 2;
+  graph2.lineThickness = 2;
+  graph2.lineAlpha = 0.5;
+  chart.addGraph(graph2);
 
+  // CATEGORY AXIS
+  chart.categoryAxis.parseDates = true;
 
+  // WRITE
+  chart.write("chartdiv");
+});
 
-
-
-// Print out rows 
-//in JSON
-$prefix = '';
-echo "[\n";
-while ( $row = mysql_fetch_assoc( $result ) ) {
-  echo $prefix . " {\n";
-  echo '  "category": "' . $row['category'] . '",' . "\n";
-  echo '  "value1": ' . $row['value1'] . ',' . "\n";
-  echo '  "value2": ' . $row['value2'] . '' . "\n";
-  echo " }";
-  $prefix = ",\n";
-}
-echo "\n]";
-
-
-
-
-
-// Close the connection
-mysql_close($link);
-
-?>
-
-<script type="text/javascript">
-	AmCharts.ready(function() {
-   // load the data
-   var chartData = AmCharts.loadJSON('data.php');
-
-   // this is a temporary line to verify if the data is loaded and parsed correctly
-   // please note, that console.debug will work on Safari/Chrome only
-   console.debug(chartData);
-
-   // build the chart
-   // ...
- });
-</script>
-
-
+  </script>
 
 </body>
 </html>
