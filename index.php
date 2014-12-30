@@ -27,10 +27,25 @@ if ( !$result ) {
   die( $message );
 }
 
-// Print out rows
+
+
+
+
+// Print out rows 
+//in JSON
+$prefix = '';
+echo "[\n";
 while ( $row = mysql_fetch_assoc( $result ) ) {
-  echo $row['category'] . ' | ' . $row['value1'] . ' | ' .$row['value2'] . "\n";
+  echo $prefix . " {\n";
+  echo '  "category": "' . $row['category'] . '",' . "\n";
+  echo '  "value1": ' . $row['value1'] . ',' . "\n";
+  echo '  "value2": ' . $row['value2'] . '' . "\n";
+  echo " }";
+  $prefix = ",\n";
 }
+echo "\n]";
+
+
 
 // Close the connection
 mysql_close($link);
